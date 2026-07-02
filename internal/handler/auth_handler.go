@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"database/sql"
 	"net/http"
 
 	"bookmarks/internal/jwt"
@@ -9,15 +8,17 @@ import (
 	
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 const ERROR_MESSAGE = "Invalid email or password"
 
-func AuthHandler(c *gin.Context, db *sql.DB) {
+func AuthHandler(c *gin.Context, db *gorm.DB) {
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
-	user, err := repository.GetUserByEmail(db, email)
+	repo := repository.NewUserRepository(db)
+	user, err := repo.GetUserByEmail(email)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": ERROR_MESSAGE})
 		return

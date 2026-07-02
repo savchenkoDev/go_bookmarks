@@ -1,25 +1,25 @@
 package user
 
 import (
-	"github.com/gin-gonic/gin"
-	"bookmarks/internal/user"
-	"database/sql"
 	"net/http"
+
+  "bookmarks/internal/models"
+	"bookmarks/internal/repository"
+  
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
-func CreateHandler(c *gin.Context, db *sql.DB) {
-  ur := user.UserRequest{
+func CreateHandler(c *gin.Context, db *gorm.DB) {
+  repo := repository.NewUserRepository(db)
+  ur := models.UserRequest{
     Email: c.PostForm("email"),
     Password: c.PostForm("password"),
   }
-  user, err := ur.Create(db)
+  user, err := repo.Create(ur)
   if err != nil {
-    error_message := "Failed to create user: " + err.Error()
-    c.JSON(http.StatusUnprocessableEntity, gin.H{"error": error_message})
-    return
-  }
-  c.JSON(http.StatusCreated, gin.H{
-		"message": "User created successfully",
-		"user": user,
-	})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully", "user": user.ToResponse()})
 }

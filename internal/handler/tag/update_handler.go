@@ -1,7 +1,8 @@
-package bookmark
+package tag
 
 import (
   "strconv"
+	"log"
 	"net/http"
 	
 	"bookmarks/internal/models"
@@ -12,7 +13,7 @@ import (
 )
 
 func UpdateHandler(c *gin.Context, db *gorm.DB) {
-	repo := repository.NewBookmarkRepository(db)
+	repo := repository.NewTagRepository(db)
 	id := c.Param("id")
 	idInt, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -20,16 +21,16 @@ func UpdateHandler(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	userID := c.GetInt64("userID")
-  var br models.BookmarkUpdateRequest
-  if err := c.ShouldBindJSON(&br); err != nil {
+  var tr models.TagUpdateRequest
+  if err := c.ShouldBindJSON(&tr); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid request body: " + err.Error()})
 		return
 	}
-
-  b, err := repo.Update(userID, idInt, br)
+  log.Println("handler tr:", tr)
+  t, err := repo.Update(userID, idInt, tr)
   if err != nil {
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Failed to update bookmark: " + err.Error()})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Failed to update tag: " + err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Bookmark updated successfully", "bookmark": b.ToResponse()})
+	c.JSON(http.StatusOK, gin.H{"message": "Tag updated successfully", "tag": t.ToResponse()})
 }

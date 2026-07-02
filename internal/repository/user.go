@@ -1,24 +1,64 @@
 package repository
 
 import (
-	"database/sql"
-	"bookmarks/internal/user"
+	"bookmarks/internal/models"
+
+	"gorm.io/gorm"	
+	"golang.org/x/crypto/bcrypt"
 )
 
-func GetUserByID(db *sql.DB, id int64) (user.User, error) {
-	var u user.User
-	err := db.QueryRow("SELECT id, email FROM users WHERE id = $1", id).Scan(&u.ID, &u.Email)
+type UserRepository struct {
+	db *gorm.DB
+}
+
+func NewUserRepository(db *gorm.DB) *UserRepository {
+	return &UserRepository{db: db}
+}
+
+func (r *UserRepository) GetUserByID(id int64) (models.User, error) {
+	var u models.User
+	err := r.db.Where("id = ?", id).First(&u).Error
 	if err != nil {
-		return user.User{}, err
+		return models.User{}, err
+	}
+	return u, nil
+}
+func (r *UserRepository) GetUserByEmail(email string) (models.User, error) {
+	var u models.User
+	err := r.db.Where("email = ?", email).First(&u).Error
+	if err != nil {
+		return models.User{}, err
 	}
 	return u, nil
 }
 
-func GetUserByEmail(db *sql.DB, email string) (user.User, error) {
-	var u user.User
-	err := db.QueryRow("SELECT id, email, password_hash FROM users WHERE email = $1", email).Scan(&u.ID, &u.Email, &u.PasswordHash)
+func (r *UserRepository) Create(u models.UserRequest) (models.User, error) {
+	var user models.User
+
+	passwordHash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return user.User{}, err
+		return models.User{}, err
 	}
-	return u, nil
+	user = models.User{
+		Email: u.Email,
+		PasswordHash: string(passwordHash),
+	}
+	err = r.db.Create(&user).Error
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
+}
+
+func (r *UserRepository) Update(id int64, u models.UserRequest) (models.User, error) {
+	var user models.User
+	err := r.db.Model(&models.User{}).Where("id = ?", id).Updates(u).Error
+	if err != nil {
+		return models.User{}, err
+	}
+	return user, nil
+}
+
+func (r *UserRepository) Delete(id int64) error {
+	return r.db.Delete(&models.User{}, id).Error
 }

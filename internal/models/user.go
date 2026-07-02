@@ -1,15 +1,12 @@
-package user
+package models
 
 import (
-	"database/sql"
 	"time"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
 type UserRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
+	Email    string `json:"email" binding:"omitempty,email"`
+	Password string `json:"password" binding:"omitempty"`
 }
 
 type UserResponse struct {
@@ -34,18 +31,4 @@ func (u *User) ToResponse() UserResponse {
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 	}
-}
-
-func (ur *UserRequest) Create(db *sql.DB) (User, error) {
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(ur.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return User{}, err
-	}
-	var u User
-	err = db.QueryRow("INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, created_at, updated_at", ur.Email, passwordHash).Scan(&u.ID, &u.Email, &u.CreatedAt, &u.UpdatedAt)
-	
-	if err != nil {
-		return User{}, err
-	}
-	return u, nil
 }

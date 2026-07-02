@@ -15,6 +15,10 @@ func (s *Server) registerBookmarkProtectedRoutes(protected *gin.RouterGroup) {
 		bookmark.CreateHandler(c, s.db)
 	})
 
+	protected.POST("/bookmarks/:bookmark_id/tags/:tag_id", func(c *gin.Context) {
+		bookmark.AttachTagHandler(c, s.db)
+	})
+
 	protected.GET("/bookmarks/:id", func(c *gin.Context) {
 		bookmark.ShowHandler(c, s.db)
 	})

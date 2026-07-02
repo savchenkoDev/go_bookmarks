@@ -1,20 +1,20 @@
 package server
 
 import (
-	"database/sql"
 	"bookmarks/internal/handler"
 	"bookmarks/internal/middleware"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 type Server struct {
-	db     *sql.DB
+	db     *gorm.DB
 	router *gin.Engine
 	port   string
 }
 
-func New(port string, db *sql.DB) *Server {
+func New(port string, db *gorm.DB) *Server {
 	s := &Server{db: db, router: gin.Default(), port: port}
 	s.setupRoutes()
 	return s
@@ -35,4 +35,5 @@ func (s *Server) setupRoutes() {
 	protected.Use(middleware.AuthMiddleware())
 	s.registerUserProtectedRoutes(protected)
   s.registerBookmarkProtectedRoutes(protected)
+  s.registerTagProtectedRoutes(protected)
 }
