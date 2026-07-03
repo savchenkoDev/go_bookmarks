@@ -11,17 +11,18 @@ import (
 )
 
 func DetachTagHandler(c *gin.Context, db *gorm.DB) {
-	userID := c.GetInt64("userID")
-	bookmark_tag_repo := repository.NewBookmarkTagRepository(db)
+	bookmarkTagRepo := repository.NewBookmarkTagRepository(db)
   bookmarkTagID, err := strconv.ParseInt(c.Param("bookmark_tag_id"), 10, 64)
   if err != nil {
     c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid bookmark tag ID: " + err.Error()})
     return
   }
-  err = bookmark_tag_repo.DetachTagFromBookmark(userID, bookmarkTagID)
+  
+  err = bookmarkTagRepo.DetachTagFromBookmark(bookmarkTagID)
   if err != nil {
     c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Failed to detach tag from bookmark: " + err.Error()})
     return
   }
+  
   c.JSON(http.StatusOK, gin.H{"message": "Tag detached from bookmark successfully"})
 }

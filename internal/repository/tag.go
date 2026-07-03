@@ -75,3 +75,20 @@ func (r *TagRepository) Delete(userID int64, id int64) error {
 	}
 	return r.db.Delete(&models.Tag{}, id).Error
 }
+
+const TAG_STAT_QUERY = `
+	SELECT
+		COUNT(id) as count
+	FROM tags
+	WHERE user_id = ?
+`
+
+func (r *TagRepository) CalculateTagStats(userID int64, stats *models.UserStats) error {
+	var count int64
+	err := r.db.Raw(TAG_STAT_QUERY, userID).Scan(&count).Error
+	if err != nil {
+		return err
+	}
+	stats.Tags = count
+	return nil
+}

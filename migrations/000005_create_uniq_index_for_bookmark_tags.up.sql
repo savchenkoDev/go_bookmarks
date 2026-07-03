@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_bookmark_tags_bookmark_id_tag_id ON bookmark_tags (bookmark_id, tag_id);

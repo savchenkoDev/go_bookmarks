@@ -1,0 +1,1 @@
+DROP INDEX idx_bookmark_tags_bookmark_id_tag_id;

@@ -15,12 +15,20 @@ func (s *Server) registerBookmarkProtectedRoutes(protected *gin.RouterGroup) {
 		bookmark.CreateHandler(c, s.db)
 	})
 
-	protected.POST("/bookmarks/:bookmark_id/tags/:tag_id", func(c *gin.Context) {
+	protected.POST("/bookmarks/:id/tags/:tag_id", func(c *gin.Context) {
 		bookmark.AttachTagHandler(c, s.db)
+	})
+
+	protected.DELETE("/bookmarks/:id/bookmark_tags/:bookmark_tag_id", func(c *gin.Context) {
+		bookmark.DetachTagHandler(c, s.db)
 	})
 
 	protected.GET("/bookmarks/:id", func(c *gin.Context) {
 		bookmark.ShowHandler(c, s.db)
+	})
+
+	protected.PUT("/bookmarks/:id/toggle_archive", func(c *gin.Context) {
+		bookmark.ToggleArchiveHandler(c, s.db)
 	})
 
 	protected.PUT("/bookmarks/:id", func(c *gin.Context) {

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX idx_tags_user_id_name ON tags (user_id, name);

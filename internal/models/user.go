@@ -4,6 +4,13 @@ import (
 	"time"
 )
 
+type UserStats struct {
+    Bookmarks int64 `json:"bookmarks" gorm:"column:total_bookmarks"`
+    Favorites int64 `json:"favorites" gorm:"column:total_favorites"`
+    Archived  int64 `json:"archived" gorm:"column:total_archived"`
+    Tags      int64 `json:"tags" gorm:"column:total_tags"`
+}
+
 type UserRequest struct {
 	Email    string `json:"email" binding:"omitempty,email"`
 	Password string `json:"password" binding:"omitempty"`

@@ -1,0 +1,1 @@
+DROP INDEX idx_tags_user_id_name;

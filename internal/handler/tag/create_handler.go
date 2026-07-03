@@ -2,6 +2,7 @@ package tag
 
 import (
 	"net/http"
+  "log"
 
 	"bookmarks/internal/models"
 	"bookmarks/internal/repository"
@@ -11,20 +12,18 @@ import (
 )
 
 func CreateHandler(c *gin.Context, db *gorm.DB) {
-  repo := repository.NewTagRepository(db)
-	userID := c.GetInt64("userID")
-  tr := models.TagRequest{
-    UserID: userID,
-    Name: c.PostForm("name"),
-  }
-  t, err := repo.Create(tr)
-  if err != nil {
-    error_message := "Failed to create tag: " + err.Error()
-    c.JSON(http.StatusUnprocessableEntity, gin.H{"error": error_message})
+  tr := models.TagRequest{}
+  if err := c.ShouldBindJSON(&tr); err != nil {
+    c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
     return
   }
-  c.JSON(http.StatusCreated, gin.H{
-		"message": "Tag created successfully",
-		"tag": t.ToResponse(),
-	})
+  tr.UserID = c.GetInt64("userID")
+  log.Println(tr)
+  repo := repository.NewTagRepository(db)
+  t, err := repo.Create(tr)
+  if err != nil {
+    c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+    return
+  }
+  c.JSON(http.StatusCreated, t)
 }

@@ -12,7 +12,7 @@ type Tag struct {
 
 type TagRequest struct {
 	UserID int64 `json:"user_id" db:"user_id"`
-	Name string `json:"name" db:"name"`
+	Name string `json:"name" binding:"required,min=4,max=20"`
 }
 
 type TagUpdateRequest struct {
@@ -21,7 +21,7 @@ type TagUpdateRequest struct {
 
 type TagResponse struct {
   ID int64 `json:"id" db:"id"`
-	Name string `json:"name" db:"name"`
+	Name string `json:"name" binding:"required,min=4,max=20"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
 }
@@ -30,7 +30,5 @@ func (t *Tag) ToResponse() TagResponse {
 	return TagResponse{
 		ID: t.ID,
 		Name: t.Name,
-		CreatedAt: t.CreatedAt,
-		UpdatedAt: t.UpdatedAt,
 	}
 }

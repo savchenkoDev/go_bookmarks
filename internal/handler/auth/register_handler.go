@@ -1,4 +1,4 @@
-package user
+package auth
 
 import (
 	"net/http"
@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateHandler(c *gin.Context, db *gorm.DB) {
+func RegisterHandler(c *gin.Context, db *gorm.DB) {
   repo := repository.NewUserRepository(db)
   ur := models.UserRequest{
     Email: c.PostForm("email"),

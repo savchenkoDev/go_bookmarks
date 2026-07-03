@@ -29,11 +29,11 @@ func (s *Server) setupRoutes() {
 	s.router.GET("/", handler.HealthHandler)
 
 	api := s.router.Group("/api/v1")
-	s.registerUserRoutes(api)
+	s.registerAuthRoutes(api)
 
   protected := api.Group("")
 	protected.Use(middleware.AuthMiddleware())
-	s.registerUserProtectedRoutes(protected)
+	s.registerUserRoutes(protected)
   s.registerBookmarkProtectedRoutes(protected)
   s.registerTagProtectedRoutes(protected)
 }

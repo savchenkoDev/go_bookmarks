@@ -1,10 +1,11 @@
-package handler
+package auth
 
 import (
 	"net/http"
 
 	"bookmarks/internal/jwt"
 	"bookmarks/internal/repository"
+	"bookmarks/internal/models"
 	
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -13,18 +14,18 @@ import (
 
 const ERROR_MESSAGE = "Invalid email or password"
 
-func AuthHandler(c *gin.Context, db *gorm.DB) {
-	email := c.PostForm("email")
-	password := c.PostForm("password")
+func LoginHandler(c *gin.Context, db *gorm.DB) {
+	var ur models.UserRequest
+	c.ShouldBindJSON(&ur)
 
 	repo := repository.NewUserRepository(db)
-	user, err := repo.GetUserByEmail(email)
+	user, err := repo.GetUserByEmail(ur.Email)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": ERROR_MESSAGE})
 		return
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(ur.Password))
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": ERROR_MESSAGE})
 		return
@@ -35,5 +36,4 @@ func AuthHandler(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"token": token})
-	return
 }

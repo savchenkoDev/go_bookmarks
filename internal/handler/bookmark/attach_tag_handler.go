@@ -13,7 +13,7 @@ import (
 func AttachTagHandler(c *gin.Context, db *gorm.DB) {
 	userID := c.GetInt64("userID")
 	bookmark_repo := repository.NewBookmarkRepository(db)
-  bookmarkID, err := strconv.ParseInt(c.Param("bookmark_id"), 10, 64)
+  bookmarkID, err := strconv.ParseInt(c.Param("id"), 10, 64)
   if err != nil {
     c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "Invalid bookmark ID: " + err.Error()})
     return
