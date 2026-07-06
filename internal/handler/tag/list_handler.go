@@ -2,7 +2,8 @@ package tag
 
 import (
 	"net/http"
-	
+
+	"bookmarks/internal/handler"
 	"bookmarks/internal/models"
 	"bookmarks/internal/repository"
 
@@ -15,16 +16,16 @@ func ListHandler(c *gin.Context, db *gorm.DB) {
 	userID := c.GetInt64("userID")
 	tags, err := repo.GetTagsByUserID(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return 
+		handler.RespondError(c, err)
+		return
 	}
 
-	t_resp := make([]models.TagResponse, len(tags))
+	tResp := make([]models.TagResponse, len(tags))
 	for i, t := range tags {
-		t_resp[i] = t.ToResponse()
+		tResp[i] = t.ToResponse()
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"count": len(t_resp),
-		"data": t_resp,
+		"count": len(tResp),
+		"data":  tResp,
 	})
 }

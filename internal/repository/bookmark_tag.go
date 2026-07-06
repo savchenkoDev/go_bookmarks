@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"bookmarks/internal/errors"
 	"bookmarks/internal/models"
 
 	"gorm.io/gorm"
@@ -17,7 +18,7 @@ func NewBookmarkTagRepository(db *gorm.DB) *BookmarkTagRepository {
 func (r *BookmarkTagRepository) DetachTagFromBookmark(bookmarkTagID int64) error {
 	err := r.db.Where("id = ?", bookmarkTagID).Delete(&models.BookmarkTag{}).Error
 	if err != nil {
-		return err
+		return errors.NewError(err)
 	}
 	return nil
 }

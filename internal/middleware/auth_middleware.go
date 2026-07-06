@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"net/http"
 	"strings"
 
+	apperr "bookmarks/internal/errors"
+	"bookmarks/internal/handler"
 	"bookmarks/internal/jwt"
 
 	"github.com/gin-gonic/gin"
@@ -11,16 +12,16 @@ import (
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		token := strings.Split(c.GetHeader("Authorization"), " ")[1]
-		if token == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		parts := strings.Split(c.GetHeader("Authorization"), " ")
+		if len(parts) != 2 || parts[1] == "" {
+			handler.RespondError(c, apperr.UnauthorizedError())
 			c.Abort()
 			return
 		}
 
-		uid, err := jwt.VerifyToken(token)
+		uid, err := jwt.VerifyToken(parts[1])
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+			handler.RespondError(c, apperr.UnauthorizedError())
 			c.Abort()
 			return
 		}

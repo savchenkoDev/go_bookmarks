@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"errors"
-	
+	"bookmarks/internal/errors"
 	"bookmarks/internal/models"
 
 	"gorm.io/gorm"
@@ -20,7 +19,7 @@ func (r *TagRepository) GetTagByIDAndUserID(id int64, userID int64) (models.Tag,
 	var tag models.Tag
 	err := r.db.Where("id = ? AND user_id = ?", id, userID).First(&tag).Error
 	if err != nil {
-		return models.Tag{}, err
+		return models.Tag{}, errors.NewError(err)
 	}
 	return tag, nil
 }
@@ -29,40 +28,39 @@ func (r *TagRepository) GetTagsByUserID(userID int64) ([]models.Tag, error) {
 	var tags []models.Tag
 	err := r.db.Where("user_id = ?", userID).Find(&tags).Error
 	if err != nil {
-		return nil, err
+		return nil, errors.NewError(err)
 	}
 	return tags, nil
 }
 
 func (r *TagRepository) Create(t models.TagRequest) (models.Tag, error) {
-	var tag models.Tag
-	tag = models.Tag{
+	tag := models.Tag{
 		UserID: t.UserID,
-		Name: t.Name,
+		Name:   t.Name,
 	}
 	err := r.db.Create(&tag).Error
 	if err != nil {
-		return models.Tag{}, err
+		return models.Tag{}, errors.NewError(err)
 	}
 	return tag, nil
 }
 
 func (r *TagRepository) Update(userID int64, id int64, tr models.TagUpdateRequest) (models.Tag, error) {
 	if tr.Name == nil {
-		return models.Tag{}, errors.New("nothing to update")
+		return models.Tag{}, errors.RecordInvalidError()
 	}
 
 	t, err := r.GetTagByIDAndUserID(id, userID)
 	if err != nil {
 		return models.Tag{}, err
 	}
-  result := r.db.Model(&t).
+	result := r.db.Model(&t).
 		Where("id = ? AND user_id = ?", id, userID).
 		Updates(map[string]interface{}{
 			"name": *tr.Name,
 		})
 	if result.Error != nil {
-			return models.Tag{}, result.Error
+		return models.Tag{}, errors.NewError(result.Error)
 	}
 
 	return r.GetTagByIDAndUserID(id, userID)
@@ -71,9 +69,13 @@ func (r *TagRepository) Update(userID int64, id int64, tr models.TagUpdateReques
 func (r *TagRepository) Delete(userID int64, id int64) error {
 	err := r.db.Where("user_id = ? AND id = ?", userID, id).Delete(&models.Tag{}).Error
 	if err != nil {
-		return err
+		return errors.NewError(err)
 	}
-	return r.db.Delete(&models.Tag{}, id).Error
+	err = r.db.Delete(&models.Tag{}, id).Error
+	if err != nil {
+		return errors.NewError(err)
+	}
+	return nil
 }
 
 const TAG_STAT_QUERY = `
@@ -87,7 +89,7 @@ func (r *TagRepository) CalculateTagStats(userID int64, stats *models.UserStats)
 	var count int64
 	err := r.db.Raw(TAG_STAT_QUERY, userID).Scan(&count).Error
 	if err != nil {
-		return err
+		return errors.NewError(err)
 	}
 	stats.Tags = count
 	return nil
