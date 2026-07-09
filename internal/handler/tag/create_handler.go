@@ -1,7 +1,6 @@
 package tag
 
 import (
-	"log"
 	"net/http"
 
 	apperr "bookmarks/internal/errors"
@@ -20,7 +19,7 @@ func CreateHandler(c *gin.Context, db *gorm.DB) {
 		return
 	}
 	tr.UserID = c.GetInt64("userID")
-	log.Println(tr)
+
 	repo := repository.NewTagRepository(db)
 	t, err := repo.Create(tr)
 	if err != nil {

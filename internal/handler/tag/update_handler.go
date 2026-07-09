@@ -1,7 +1,6 @@
 package tag
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -27,11 +26,12 @@ func UpdateHandler(c *gin.Context, db *gorm.DB) {
 		handler.RespondError(c, apperr.RecordInvalidError())
 		return
 	}
-	log.Println("handler tr:", tr)
+
 	t, err := repo.Update(userID, idInt, tr)
 	if err != nil {
 		handler.RespondError(c, err)
 		return
 	}
+
 	c.JSON(http.StatusOK, gin.H{"message": "Tag updated successfully", "tag": t.ToResponse()})
 }
