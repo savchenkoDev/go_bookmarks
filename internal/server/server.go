@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
+	"github.com/getsentry/sentry-go/gin"
 )
 
 type Server struct {
@@ -15,7 +16,15 @@ type Server struct {
 }
 
 func New(port string, db *gorm.DB) *Server {
-	s := &Server{db: db, router: gin.Default(), port: port}
+	s := &Server{db: db, router: gin.New(), port: port}
+  
+	s.router.Use(sentrygin.New(sentrygin.Options{
+		Repanic: true, // чтобы следующий recovery тоже сработал
+	}))
+	s.router.Use(gin.Recovery())              // panic → 500
+	s.router.Use(middleware.RequestID())
+	s.router.Use(middleware.RequestLogger())
+
 	s.setupRoutes()
 	return s
 }

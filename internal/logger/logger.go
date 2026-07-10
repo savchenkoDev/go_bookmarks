@@ -19,10 +19,10 @@ func New(level string) *slog.Logger {
         lvl = slog.LevelInfo
     }
 
-    handler := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-        Level: lvl,
-        AddSource: true, // опционально: file:line
+    base := slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+        Level:     lvl,
+        AddSource: true,
     })
 
-    return slog.New(handler)
+    return slog.New(&ContextHandler{Handler: base})
 }
