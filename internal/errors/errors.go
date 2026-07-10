@@ -13,7 +13,7 @@ type AppError struct {
 }
 
 func (e *AppError) Error() string {
-    return e.Message
+	return e.Message
 }
 
 type ErrorBody struct {
@@ -27,16 +27,16 @@ type Response struct {
 
 func UnauthorizedError() *AppError {
 	return &AppError{
-		Code: "unauthorized_error",
-		Message: "unauthorized",
+		Code:       "unauthorized_error",
+		Message:    "unauthorized",
 		HTTPStatus: http.StatusUnauthorized,
 	}
 }
 
 func ForbiddenError() *AppError {
 	return &AppError{
-		Code: "forbidden_error",
-		Message: "forbidden",
+		Code:       "forbidden_error",
+		Message:    "forbidden",
 		HTTPStatus: http.StatusForbidden,
 	}
 }
@@ -44,7 +44,7 @@ func ForbiddenError() *AppError {
 func NewError(err error) error {
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
-			return NotFoundError()
+		return NotFoundError()
 	case errors.Is(err, gorm.ErrInvalidData):
 		return RecordInvalidError()
 	default:
@@ -54,32 +54,32 @@ func NewError(err error) error {
 
 func NotFoundError() *AppError {
 	return &AppError{
-		Code: "not_found_error",
-		Message: "not found",
+		Code:       "not_found_error",
+		Message:    "not found",
 		HTTPStatus: http.StatusNotFound,
 	}
 }
 
 func RecordInvalidError() *AppError {
 	return &AppError{
-		Code: "record_invalid_error",
-		Message: "record invalid",
+		Code:       "record_invalid_error",
+		Message:    "record invalid",
 		HTTPStatus: http.StatusUnprocessableEntity,
 	}
 }
 
 func InvalidIDError() *AppError {
 	return &AppError{
-		Code: "invalid_id",
-		Message: "invalid id",
+		Code:       "invalid_id",
+		Message:    "invalid id",
 		HTTPStatus: http.StatusUnprocessableEntity,
 	}
 }
 
 func InternalError() *AppError {
 	return &AppError{
-		Code: "internal_error",
-		Message: "internal server error",
+		Code:       "internal_error",
+		Message:    "internal server error",
 		HTTPStatus: http.StatusInternalServerError,
 	}
 }

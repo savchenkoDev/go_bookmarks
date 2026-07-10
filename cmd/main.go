@@ -1,16 +1,16 @@
 package main
 
 import (
+	"log/slog"
 	"os"
-	"log/slog"	
 	"time"
 
 	"bookmarks/internal/config"
-	"bookmarks/internal/server"
 	"bookmarks/internal/logger"
+	"bookmarks/internal/server"
 
-	"github.com/joho/godotenv"
 	"github.com/getsentry/sentry-go"
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 		TracesSampleRate: 0.2,
 	})
 	if err != nil {
-			slog.Error("sentry init failed", "error", err)
+		slog.Error("sentry init failed", "error", err)
 	}
 	defer sentry.Flush(2 * time.Second)
 

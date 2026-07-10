@@ -9,6 +9,7 @@ import (
 
 const RequestIDKey = "requestID"
 const RequestIDHeader = "X-Request-ID"
+
 type requestIDContextKey struct{}
 
 func RequestID() gin.HandlerFunc {

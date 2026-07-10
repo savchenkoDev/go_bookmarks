@@ -1,12 +1,14 @@
 package server
 
 import (
+	"bookmarks/internal/config"
 	"bookmarks/internal/handler"
 	"bookmarks/internal/middleware"
 
+	"github.com/getsentry/sentry-go/gin"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"github.com/getsentry/sentry-go/gin"
 )
 
 type Server struct {
@@ -17,11 +19,13 @@ type Server struct {
 
 func New(port string, db *gorm.DB) *Server {
 	s := &Server{db: db, router: gin.New(), port: port}
-  
+
+	s.router.Use(cors.New(config.Cors()))
+
 	s.router.Use(sentrygin.New(sentrygin.Options{
 		Repanic: true, // чтобы следующий recovery тоже сработал
 	}))
-	s.router.Use(gin.Recovery())              // panic → 500
+	s.router.Use(gin.Recovery()) // panic → 500
 	s.router.Use(middleware.RequestID())
 	s.router.Use(middleware.RequestLogger())
 
@@ -40,9 +44,9 @@ func (s *Server) setupRoutes() {
 	api := s.router.Group("/api/v1")
 	s.registerAuthRoutes(api)
 
-  protected := api.Group("")
+	protected := api.Group("")
 	protected.Use(middleware.AuthMiddleware())
 	s.registerUserRoutes(protected)
-  s.registerBookmarkProtectedRoutes(protected)
-  s.registerTagProtectedRoutes(protected)
+	s.registerBookmarkProtectedRoutes(protected)
+	s.registerTagProtectedRoutes(protected)
 }

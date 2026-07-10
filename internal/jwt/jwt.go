@@ -1,11 +1,11 @@
 package jwt
 
 import (
-	"time"
-	"os"
 	"errors"
-	"log"
 	"github.com/golang-jwt/jwt/v5"
+	"log"
+	"os"
+	"time"
 )
 
 const JWT_EXPIRATION_HOURS = 1
@@ -29,7 +29,7 @@ func VerifyToken(tokenString string) (int64, error) {
 	if !token.Valid {
 		log.Println("Invalid token")
 		return 0, errors.New("invalid token")
-		}
+	}
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		log.Println("Invalid token claims")

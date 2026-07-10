@@ -7,7 +7,7 @@ import (
 
 type StatisticService struct {
 	bookmarkRepo *repository.BookmarkRepository
-	tagsRepo *repository.TagRepository
+	tagsRepo     *repository.TagRepository
 }
 
 func NewStatisticService(bookmarkRepo *repository.BookmarkRepository, tagsRepo *repository.TagRepository) *StatisticService {

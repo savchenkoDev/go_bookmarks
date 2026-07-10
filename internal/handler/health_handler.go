@@ -8,9 +8,9 @@ import (
 
 func HealthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
-		"message": "Welcome to the bookmarks API!",
-		"version": "1.0.0",
-		"status": "ok",
+		"message":   "Welcome to the bookmarks API!",
+		"version":   "1.0.0",
+		"status":    "ok",
 		"timestamp": time.Now().Format(time.RFC3339),
 	})
 }
