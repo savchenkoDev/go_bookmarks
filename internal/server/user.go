@@ -12,6 +12,6 @@ func (s *Server) registerUserRoutes(protected *gin.RouterGroup) {
 	})
 
 	protected.GET("/stats", func(c *gin.Context) {
-		user.StatsHandler(c, s.db)
+		user.StatsHandler(c, s.db, s.cache)
 	})
 }

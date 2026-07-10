@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"bookmarks/internal/cache"
 	"bookmarks/internal/config"
 	"bookmarks/internal/logger"
 	"bookmarks/internal/server"
@@ -14,6 +15,7 @@ import (
 )
 
 func main() {
+	_ = godotenv.Load()
 	log := logger.New(os.Getenv("LOG_LEVEL"))
 	slog.SetDefault(log)
 
@@ -28,7 +30,12 @@ func main() {
 	}
 	defer sentry.Flush(2 * time.Second)
 
-	_ = godotenv.Load()
+	rdb, err := config.NewRedis()
+	if err != nil {
+		slog.Error("Failed to connect to redis", "error", err)
+	}
+	defer rdb.Close()
+	
 	gormDB, err := config.NewGormDB()
 	if err != nil {
 		slog.Error("Failed to connect to database", "error", err)
@@ -38,8 +45,9 @@ func main() {
 	if port != "" && port[0] != ':' {
 		port = ":" + port
 	}
-
-	server := server.New(port, gormDB)
+  
+	c := cache.New(rdb)
+	server := server.New(port, gormDB, c)
 	if err := server.Run(); err != nil {
 		slog.Error("Failed to run server", "error", err)
 	}

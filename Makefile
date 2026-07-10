@@ -27,6 +27,5 @@ debug:
 
 shell:
 	docker compose -f docker-compose.dev.yaml exec app sh
-
 init:
 	docker compose exec db psql -U postgres -d postgres -c "CREATE USER postgres WITH PASSWORD 'postgres';"

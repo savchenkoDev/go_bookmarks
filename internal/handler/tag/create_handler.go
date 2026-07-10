@@ -1,8 +1,10 @@
 package tag
 
 import (
+	"fmt"
 	"net/http"
 
+	"bookmarks/internal/cache"
 	apperr "bookmarks/internal/errors"
 	"bookmarks/internal/handler"
 	"bookmarks/internal/models"
@@ -12,7 +14,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateHandler(c *gin.Context, db *gorm.DB) {
+func CreateHandler(c *gin.Context, db *gorm.DB, cache *cache.Cache) {
 	tr := models.TagRequest{}
 	if err := c.ShouldBindJSON(&tr); err != nil {
 		handler.RespondError(c, apperr.RecordInvalidError())
@@ -26,5 +28,6 @@ func CreateHandler(c *gin.Context, db *gorm.DB) {
 		handler.RespondError(c, err)
 		return
 	}
+	_ = cache.Delete(c.Request.Context(), fmt.Sprintf("user:tags:%d", tr.UserID))
 	c.JSON(http.StatusCreated, t)
 }

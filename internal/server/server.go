@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bookmarks/internal/cache"
 	"bookmarks/internal/config"
 	"bookmarks/internal/handler"
 	"bookmarks/internal/middleware"
@@ -13,12 +14,13 @@ import (
 
 type Server struct {
 	db     *gorm.DB
+	cache  *cache.Cache
 	router *gin.Engine
 	port   string
 }
 
-func New(port string, db *gorm.DB) *Server {
-	s := &Server{db: db, router: gin.New(), port: port}
+func New(port string, db *gorm.DB, cache *cache.Cache) *Server {
+	s := &Server{db: db, cache: cache, router: gin.New(), port: port}
 
 	s.router.Use(cors.New(config.Cors()))
 

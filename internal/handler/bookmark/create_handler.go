@@ -1,8 +1,10 @@
 package bookmark
 
 import (
+	"fmt"
 	"net/http"
 
+	"bookmarks/internal/cache"
 	"bookmarks/internal/handler"
 	"bookmarks/internal/models"
 	"bookmarks/internal/repository"
@@ -11,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func CreateHandler(c *gin.Context, db *gorm.DB) {
+func CreateHandler(c *gin.Context, db *gorm.DB, cache *cache.Cache) {
 	repo := repository.NewBookmarkRepository(db)
 	userID := c.GetInt64("userID")
 	br := models.BookmarkRequest{
@@ -26,6 +28,8 @@ func CreateHandler(c *gin.Context, db *gorm.DB) {
 		handler.RespondError(c, err)
 		return
 	}
+
+	_ = cache.Delete(c.Request.Context(), fmt.Sprintf("user:stats:%d", userID))
 	c.JSON(http.StatusCreated, gin.H{
 		"message":  "Bookmark created successfully",
 		"bookmark": b.ToResponse(),
