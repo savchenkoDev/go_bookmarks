@@ -16,6 +16,7 @@ func RespondError(c *gin.Context, err error) {
 			Error: apperr.ErrorBody{
 				Code:    appError.Code,
 				Message: appError.Message,
+				Details: appError.Details,
 			},
 		})
 		return
@@ -25,6 +26,7 @@ func RespondError(c *gin.Context, err error) {
 		Error: apperr.ErrorBody{
 			Code:    apperr.InternalError().Code,
 			Message: apperr.InternalError().Message,
+			Details: err.Error(),
 		},
 	})
 }
